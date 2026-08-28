@@ -3,7 +3,7 @@
 // ============================================================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 import {
   getFirestore, doc, getDoc, setDoc
@@ -80,6 +80,35 @@ async function startFirebase(){
   const app = initializeApp(CONFIG.FIREBASE_CONFIG);
   const auth = getAuth(app);
   db = getFirestore(app);
+
+  async function handleGoogleCredential(idToken){
+    loginStatus.textContent = 'Entrando...';
+    try{
+      await signInWithCredential(auth, GoogleAuthProvider.credential(idToken));
+    }catch(err){
+      loginStatus.textContent = 'Não foi possível entrar. Tente novamente.';
+    }
+  }
+
+  function setupGoogleButton(){
+    if(typeof google === 'undefined' || !google.accounts || !google.accounts.id){
+      setTimeout(setupGoogleButton, 300);
+      return;
+    }
+    google.accounts.id.initialize({
+      client_id: CONFIG.GOOGLE_CLIENT_ID,
+      callback: (response) => handleGoogleCredential(response.credential)
+    });
+    google.accounts.id.renderButton(document.getElementById('googleBtnContainer'), {
+      theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'pill', width: 260
+    });
+  }
+  if(CONFIG.GOOGLE_CLIENT_ID){
+    setupGoogleButton();
+  } else {
+    // Sem Client ID configurado ainda (Calendar) — usa o popup do Firebase como alternativa
+    loginBtn.style.display = 'inline-flex';
+  }
 
   loginBtn.addEventListener('click', () => {
     loginStatus.textContent = 'Entrando...';
