@@ -3,7 +3,7 @@
 // ============================================================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
 import {
-  getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut
+  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 import {
   getFirestore, doc, getDoc, setDoc
@@ -83,17 +83,14 @@ async function startFirebase(){
 
   loginBtn.addEventListener('click', () => {
     loginStatus.textContent = 'Entrando...';
-    signInWithRedirect(auth, new GoogleAuthProvider());
+    signInWithPopup(auth, new GoogleAuthProvider()).catch((err) => {
+      if(err && err.code === 'auth/popup-closed-by-user') return;
+      loginStatus.textContent = 'Não foi possível entrar. Tente novamente.';
+    });
   });
   logoutBtn.addEventListener('click', () => {
     signOut(auth);
   });
-
-  try{
-    await getRedirectResult(auth);
-  }catch(err){
-    loginStatus.textContent = 'Não foi possível entrar. Tente novamente.';
-  }
 
   onAuthStateChanged(auth, async (user) => {
     if(user){
