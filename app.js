@@ -1,157 +1,16 @@
-// ============================================================
-// FIREBASE — autenticação e banco de dados na nuvem
-// ============================================================
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, onAuthStateChanged, signOut
-} from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
-import {
-  getFirestore, doc, getDoc, setDoc
-} from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
-
-const loginScreen = document.getElementById('loginScreen');
-const appRoot = document.getElementById('app');
-const loginBtn = document.getElementById('loginBtn');
-const loginStatus = document.getElementById('loginStatus');
-const accountEmail = document.getElementById('accountEmail');
-const logoutBtn = document.getElementById('logoutBtn');
-
-let cloudData = {};
-let currentUid = null;
-let db = null;
-let saveTimer = null;
-let appStarted = false;
-
-// ===== Storage helpers (agora respaldados pelo Firestore) =====
+// ===== Storage helpers =====
 const store = {
   get(key, fallback){
-    return (key in cloudData) ? cloudData[key] : fallback;
+    try{
+      const v = localStorage.getItem('synapse:'+key);
+      return v ? JSON.parse(v) : fallback;
+    }catch(e){ return fallback; }
   },
   set(key, value){
-    cloudData[key] = value;
-    scheduleSave();
+    try{ localStorage.setItem('synapse:'+key, JSON.stringify(value)); }catch(e){}
   }
 };
-
-function scheduleSave(){
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToCloud, 600);
-}
-async function saveToCloud(){
-  if(!db || !currentUid) return;
-  try{
-    await setDoc(doc(db, 'users', currentUid), cloudData, { merge: true });
-  }catch(err){
-    console.error('Erro ao salvar na nuvem:', err);
-  }
-}
-
-function firebaseConfigured(){
-  return typeof CONFIG !== 'undefined' && CONFIG.FIREBASE_CONFIG && CONFIG.FIREBASE_CONFIG.apiKey && CONFIG.FIREBASE_CONFIG.apiKey.length > 5;
-}
-
-// Migração única: se a pessoa já tinha dados salvos neste navegador
-// (versão antiga, sem nuvem) e a conta na nuvem ainda está vazia,
-// importa esses dados locais automaticamente.
-function migrateLegacyLocalData(){
-  const migrated = {};
-  let found = false;
-  try{
-    for(let i=0; i<localStorage.length; i++){
-      const key = localStorage.key(i);
-      if(key && key.startsWith('synapse:')){
-        const shortKey = key.slice('synapse:'.length);
-        try{ migrated[shortKey] = JSON.parse(localStorage.getItem(key)); found = true; }catch(e){}
-      }
-    }
-  }catch(e){}
-  return found ? migrated : null;
-}
-
-async function startFirebase(){
-  if(!firebaseConfigured()){
-    loginScreen.querySelector('.login-box').innerHTML = `
-      <h2 style="font-family:var(--font-display); font-size:19px; margin-bottom:10px;">Configuração pendente</h2>
-      <p class="login-sub">O banco de dados na nuvem ainda não foi configurado. Siga o passo a passo do <strong>README.md</strong> (criar projeto no Firebase → ativar Authentication e Firestore) e cole as chaves em <code>config.js</code>.</p>
-    `;
-    return;
-  }
-
-  const app = initializeApp(CONFIG.FIREBASE_CONFIG);
-  const auth = getAuth(app);
-  db = getFirestore(app);
-
-  async function handleGoogleCredential(idToken){
-    loginStatus.textContent = 'Entrando...';
-    try{
-      await signInWithCredential(auth, GoogleAuthProvider.credential(idToken));
-    }catch(err){
-      loginStatus.textContent = 'Não foi possível entrar. Tente novamente.';
-    }
-  }
-
-  function setupGoogleButton(){
-    if(typeof google === 'undefined' || !google.accounts || !google.accounts.id){
-      setTimeout(setupGoogleButton, 300);
-      return;
-    }
-    google.accounts.id.initialize({
-      client_id: CONFIG.GOOGLE_CLIENT_ID,
-      callback: (response) => handleGoogleCredential(response.credential)
-    });
-    google.accounts.id.renderButton(document.getElementById('googleBtnContainer'), {
-      theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'pill', width: 260
-    });
-  }
-  if(CONFIG.GOOGLE_CLIENT_ID){
-    setupGoogleButton();
-  } else {
-    // Sem Client ID configurado ainda (Calendar) — usa o popup do Firebase como alternativa
-    loginBtn.style.display = 'inline-flex';
-  }
-
-  loginBtn.addEventListener('click', () => {
-    loginStatus.textContent = 'Entrando...';
-    signInWithPopup(auth, new GoogleAuthProvider()).catch((err) => {
-      if(err && err.code === 'auth/popup-closed-by-user') return;
-      loginStatus.textContent = 'Não foi possível entrar. Tente novamente.';
-    });
-  });
-  logoutBtn.addEventListener('click', () => {
-    signOut(auth);
-  });
-
-  onAuthStateChanged(auth, async (user) => {
-    if(user){
-      currentUid = user.uid;
-      loginStatus.textContent = '';
-      accountEmail.textContent = user.email || user.displayName || '';
-
-      const snap = await getDoc(doc(db, 'users', currentUid));
-      if(snap.exists()){
-        cloudData = snap.data();
-      } else {
-        const legacy = migrateLegacyLocalData();
-        cloudData = legacy || {};
-        if(legacy) await saveToCloud();
-      }
-
-      loginScreen.style.display = 'none';
-      appRoot.style.display = 'grid';
-
-      if(!appStarted){
-        appStarted = true;
-        initApp();
-      }
-    } else {
-      currentUid = null;
-      cloudData = {};
-      loginScreen.style.display = 'flex';
-      appRoot.style.display = 'none';
-    }
-  });
-}
-startFirebase();
+initApp();
 
 // ===== Service worker (PWA) — roda independente do login =====
 if('serviceWorker' in navigator){

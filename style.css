@@ -154,35 +154,6 @@ code{font-family:var(--font-mono); background:var(--surface-2); padding:1px 5px;
 }
 .theme-toggle:hover{color:var(--ink);}
 
-.account-box{
-  display:flex; align-items:center; justify-content:space-between; gap:8px;
-  padding:8px 10px; margin-top:4px;
-}
-.account-email{
-  font-size:11.5px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;
-}
-
-/* ===== Login screen ===== */
-.login-screen{
-  min-height:100vh;
-  display:flex; align-items:center; justify-content:center;
-  background:var(--bg);
-  padding:20px;
-}
-.login-box{
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:36px 32px;
-  max-width:340px;
-  width:100%;
-  text-align:center;
-}
-.login-sub{color:var(--ink-soft); font-size:14px; margin:8px 0 22px;}
-.login-status{color:var(--ink-soft); font-size:12.5px; margin-top:14px; min-height:16px;}
-.google-btn-container{display:flex; justify-content:center; min-height:44px;}
-
 .mobile-bar{
   display:none;
   align-items:center;
