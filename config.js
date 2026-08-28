@@ -13,7 +13,7 @@
 // do Firestore (explicadas no README), não de esconder essas chaves.
 
 window.CONFIG = {
-  GOOGLE_CLIENT_ID: '',
+  GOOGLE_CLIENT_ID: '502207561517-uoeeel3vo8fa442vc0e95afi3eaqu17k.apps.googleusercontent.com',
   FIREBASE_CONFIG: {
     apiKey: 'AIzaSyAHHa4Q_OTHnJ1ayRZs5jYMdT4w_mEIrAo',
     authDomain: 'synapse-301da.firebaseapp.com',
