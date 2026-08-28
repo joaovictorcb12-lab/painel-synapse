@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Synapse — painel pessoal</title>
+<meta name="description" content="Painel pessoal de desenvolvimento: agenda, notas, hábitos, tarefas, diário e metas.">
+<meta name="theme-color" content="#3F6C5D">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="brand" style="justify-content:center; margin-bottom:6px;">
+      <svg class="brand-mark" width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <circle cx="6" cy="8" r="2.4" fill="currentColor"/>
+        <circle cx="23" cy="6" r="2" fill="currentColor"/>
+        <circle cx="24" cy="22" r="2.4" fill="currentColor"/>
+        <circle cx="9" cy="24" r="1.8" fill="currentColor"/>
+        <circle cx="15" cy="15" r="2.8" fill="currentColor"/>
+        <path d="M6 8 L15 15 L23 6 M15 15 L24 22 M15 15 L9 24" stroke="currentColor" stroke-width="1.1" opacity="0.55"/>
+      </svg>
+      <span class="brand-name">Synapse</span>
+    </div>
+    <p class="login-sub">Seus dados, sincronizados entre seus dispositivos.</p>
+    <button class="primary-btn" id="loginBtn">Entrar com Google</button>
+    <p class="login-status" id="loginStatus"></p>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none">
+
+  <!-- ===== Sidebar ===== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 30 30" fill="none">
+        <circle cx="6" cy="8" r="2.4" fill="currentColor"/>
+        <circle cx="23" cy="6" r="2" fill="currentColor"/>
+        <circle cx="24" cy="22" r="2.4" fill="currentColor"/>
+        <circle cx="9" cy="24" r="1.8" fill="currentColor"/>
+        <circle cx="15" cy="15" r="2.8" fill="currentColor"/>
+        <path d="M6 8 L15 15 L23 6 M15 15 L24 22 M15 15 L9 24" stroke="currentColor" stroke-width="1.1" opacity="0.55"/>
+      </svg>
+      <span class="brand-name">Synapse</span>
+    </div>
+
+    <button class="search-trigger" id="searchTrigger">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4.8" stroke="currentColor" stroke-width="1.4"/><path d="M13 13l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span>Buscar</span>
+      <kbd>⌘K</kbd>
+    </button>
+
+    <div class="nav-scroll">
+      <div class="nav-group">
+        <p class="nav-group-label">Hoje</p>
+        <button class="nav-link active" data-tab="dashboard">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.4" stroke="currentColor" stroke-width="1.4"/><rect x="10" y="2" width="6" height="6" rx="1.4" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="10" width="6" height="6" rx="1.4" stroke="currentColor" stroke-width="1.4"/><rect x="10" y="10" width="6" height="6" rx="1.4" stroke="currentColor" stroke-width="1.4"/></svg>
+          Painel
+        </button>
+        <button class="nav-link" data-tab="agenda">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3.5" width="14" height="12" rx="1.6" stroke="currentColor" stroke-width="1.4"/><path d="M2 7h14M5.5 2v3M12.5 2v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Agenda
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">Produtividade</p>
+        <button class="nav-link" data-tab="tarefas">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 9l2.2 2.2L12.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Tarefas
+        </button>
+        <button class="nav-link" data-tab="habitos">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 9a6 6 0 1 1-1.8-4.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M15 2.5V6h-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Hábitos
+        </button>
+        <button class="nav-link" data-tab="foco">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="0.8" fill="currentColor"/></svg>
+          Foco
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">Estudos</p>
+        <button class="nav-link" data-tab="estudos">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3L16 6.5L9 10L2 6.5L9 3Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5 8v3c0 1 1.8 2 4 2s4-1 4-2V8" stroke="currentColor" stroke-width="1.3"/><path d="M16 6.5v3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          ENAMED
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">Treino</p>
+        <button class="nav-link" data-tab="treino">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="6.5" width="2.5" height="5" rx="0.8" stroke="currentColor" stroke-width="1.3"/><rect x="14" y="6.5" width="2.5" height="5" rx="0.8" stroke="currentColor" stroke-width="1.3"/><path d="M4 9h1.5M12.5 9H14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.5 9h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Musculação
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">Crescimento</p>
+        <button class="nav-link" data-tab="notas">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2" width="13" height="14" rx="1.6" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6.5h7M5.5 9.5h7M5.5 12.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Notas
+        </button>
+        <button class="nav-link" data-tab="diario">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2.5 3.5c2-1 4.5-1 6.5.5 2-1.5 4.5-1.5 6.5-.5v10.5c-2-1-4.5-1-6.5.5-2-1.5-4.5-1.5-6.5-.5V3.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 4v10.5" stroke="currentColor" stroke-width="1.4"/></svg>
+          Diário
+        </button>
+        <button class="nav-link" data-tab="flashcards">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="5.5" width="11" height="9" rx="1.4" stroke="currentColor" stroke-width="1.4"/><path d="M2 11V4.5c0-.55.45-1 1-1H12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Revisão
+        </button>
+        <button class="nav-link" data-tab="metas">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2v14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4 2.8h8.5l-2 2.8 2 2.8H4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Metas
+        </button>
+        <button class="nav-link" data-tab="progresso">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2.5 15.5V2.5M2.5 15.5H15.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="4.5" y="10" width="2.4" height="5" rx="0.6" fill="currentColor"/><rect x="8.3" y="6.5" width="2.4" height="8.5" rx="0.6" fill="currentColor"/><rect x="12.1" y="3.5" width="2.4" height="11.5" rx="0.6" fill="currentColor"/></svg>
+          Progresso
+        </button>
+      </div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro">
+      <svg id="iconSun" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.2" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v1.4M8 13.6V15M15 8h-1.4M2.4 8H1M12.7 3.3l-1 1M4.3 11.7l-1 1M12.7 12.7l-1-1M4.3 4.3l-1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <svg id="iconMoon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:none"><path d="M13.5 9.5A6 6 0 1 1 6.5 2.5a5 5 0 0 0 7 7Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      <span id="themeLabel">Modo escuro</span>
+    </button>
+
+    <div class="account-box" id="accountBox">
+      <span class="account-email" id="accountEmail"></span>
+      <button class="ghost-btn small" id="logoutBtn">Sair</button>
+    </div>
+  </nav>
+
+  <!-- mobile top bar -->
+  <div class="mobile-bar">
+    <button id="mobileMenuBtn" aria-label="Abrir menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+    <span class="mobile-title" id="mobileTitle">Painel</span>
+    <button id="mobileSearchBtn" aria-label="Buscar">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M15 15l-3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ===== Main ===== -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section class="tab active" id="tab-dashboard">
+      <header class="tab-head">
+        <p class="eyebrow">visão geral</p>
+        <h1 id="dashboardGreeting">Seu dia</h1>
+        <p class="sub" id="dashboardDate"></p>
+      </header>
+
+      <div class="quote-strip" id="quoteStripDash"></div>
+
+      <div class="quick-actions">
+        <button class="qa-btn" data-goto="tarefas" data-focus="taskInput">+ Tarefa</button>
+        <button class="qa-btn" data-goto="notas" data-focus="noteTitleInput">+ Nota</button>
+        <button class="qa-btn" data-goto="agenda" data-focus="evTitle">+ Evento</button>
+        <button class="qa-btn" data-goto="habitos" data-focus="habitInput">+ Hábito</button>
+      </div>
+
+      <div class="stats-row" id="dashStatsRow"></div>
+
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="card-head-row"><h3>Tarefas de hoje</h3><button class="link-btn" data-goto="tarefas">ver todas</button></div>
+          <div id="dashTasks" class="dash-list"></div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-head-row"><h3>Hábitos de hoje</h3><button class="link-btn" data-goto="habitos">ver todos</button></div>
+          <div id="dashHabits" class="dash-list"></div>
+        </div>
+
+        <div class="dash-card dash-card-wide">
+          <div class="card-head-row"><h3>Próximos eventos</h3><button class="link-btn" data-goto="agenda">ver agenda</button></div>
+          <div id="dashEvents" class="dash-list"></div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-head-row"><h3>Metas próximas</h3><button class="link-btn" data-goto="metas">ver todas</button></div>
+          <div id="dashGoals" class="dash-list"></div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-head-row"><h3>ENAMED</h3><button class="link-btn" data-goto="estudos">ver detalhes</button></div>
+          <div id="dashStudy" class="dash-list"></div>
+        </div>
+
+        <div class="dash-card">
+          <div class="card-head-row"><h3>Treino</h3><button class="link-btn" data-goto="treino">ver todos</button></div>
+          <div id="dashWorkout" class="dash-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENDA -->
+    <section class="tab" id="tab-agenda">
+      <header class="tab-head">
+        <p class="eyebrow">agenda</p>
+        <h1>Agenda</h1>
+        <p class="sub">Sua rotina, sincronizada com o Google.</p>
+      </header>
+
+      <div class="agenda-embed-card" id="googleStatusCard">
+        <div class="card-head-row">
+          <h3 id="googleStatusTitle">Google Agenda</h3>
+          <button class="primary-btn small" id="googleConnectBtn">Conectar Google Agenda</button>
+        </div>
+        <p class="hint" id="googleStatusHint">Conecte sua conta Google para ver e criar eventos direto por aqui.</p>
+        <div class="setup-steps" id="setupSteps" style="display:none">
+          <p>Integração ainda não configurada. Siga o passo a passo do <strong>README.md</strong> (Google Cloud Console → ativar Calendar API → criar Client ID) e cole a chave em <code>config.js</code>.</p>
+        </div>
+      </div>
+
+      <div class="agenda-columns" id="agendaColumns" style="display:none">
+        <div class="agenda-embed-card">
+          <div class="card-head-row"><h3>Novo evento</h3></div>
+          <form id="eventForm" class="event-form">
+            <input type="text" id="evTitle" placeholder="Título do evento..." autocomplete="off" required>
+            <div class="event-row">
+              <label>Data<input type="date" id="evDate" required></label>
+              <label>Início<input type="time" id="evStart" required></label>
+              <label>Fim<input type="time" id="evEnd" required></label>
+            </div>
+            <textarea id="evDesc" placeholder="Descrição (opcional)" rows="2"></textarea>
+            <button type="submit" class="primary-btn">Adicionar à Google Agenda</button>
+            <p class="event-feedback" id="eventFeedback"></p>
+          </form>
+        </div>
+
+        <div class="agenda-embed-card">
+          <div class="card-head-row"><h3>Próximos eventos</h3><button class="ghost-btn small" id="refreshEventsBtn">Atualizar</button></div>
+          <div id="eventsList" class="dash-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAREFAS -->
+    <section class="tab" id="tab-tarefas">
+      <header class="tab-head">
+        <p class="eyebrow">a fazer</p>
+        <h1>Tarefas</h1>
+        <p class="sub">O que precisa sair da cabeça e ir pro papel.</p>
+      </header>
+
+      <form class="add-row" id="taskForm">
+        <input type="text" id="taskInput" placeholder="Adicionar tarefa..." autocomplete="off">
+        <select id="taskPriority">
+          <option value="baixa">Baixa</option>
+          <option value="media" selected>Média</option>
+          <option value="alta">Alta</option>
+        </select>
+        <input type="date" id="taskDueInput" title="Prazo (opcional)">
+        <button type="submit" class="primary-btn">Adicionar</button>
+      </form>
+
+      <div class="filter-row" id="taskFilterRow">
+        <button class="filter-chip active" data-filter="todas">Todas</button>
+        <button class="filter-chip" data-filter="pendentes">Pendentes</button>
+        <button class="filter-chip" data-filter="concluidas">Concluídas</button>
+      </div>
+
+      <ul class="task-list" id="taskList"></ul>
+      <p class="empty-note" id="taskEmptyNote">Sem tarefas pendentes. Bom sinal.</p>
+    </section>
+
+    <!-- HÁBITOS -->
+    <section class="tab" id="tab-habitos">
+      <header class="tab-head">
+        <p class="eyebrow">rotina</p>
+        <h1>Hábitos</h1>
+        <p class="sub">Pequenas repetições, resultado composto.</p>
+      </header>
+
+      <form class="add-row" id="habitForm">
+        <input type="text" id="habitInput" placeholder="Novo hábito (ex: treinar, revisar anatomia)..." autocomplete="off">
+        <button type="submit" class="primary-btn">Adicionar</button>
+      </form>
+
+      <div class="habit-grid" id="habitGrid"></div>
+      <p class="empty-note" id="habitEmptyNote">Nenhum hábito cadastrado ainda.</p>
+    </section>
+
+    <!-- FOCO / POMODORO -->
+    <section class="tab" id="tab-foco">
+      <header class="tab-head">
+        <p class="eyebrow">concentração</p>
+        <h1>Foco</h1>
+        <p class="sub">Blocos de trabalho profundo, sem distração.</p>
+      </header>
+
+      <div class="pomodoro-card">
+        <div class="pomodoro-ring-wrap">
+          <svg class="pomodoro-ring" width="220" height="220" viewBox="0 0 220 220">
+            <circle cx="110" cy="110" r="98" class="ring-bg"/>
+            <circle cx="110" cy="110" r="98" class="ring-fg" id="ringFg"/>
+          </svg>
+          <div class="pomodoro-time" id="pomodoroTime">25:00</div>
+        </div>
+        <p class="pomodoro-mode" id="pomodoroMode">Foco</p>
+        <div class="pomodoro-controls">
+          <button class="ghost-btn" id="pomodoroReset">Reiniciar</button>
+          <button class="primary-btn" id="pomodoroToggle">Iniciar</button>
+          <button class="ghost-btn" id="pomodoroSkip">Pular</button>
+        </div>
+        <div class="pomodoro-settings">
+          <label>Foco (min) <input type="number" id="focusMin" value="25" min="5" max="90"></label>
+          <label>Pausa (min) <input type="number" id="breakMin" value="5" min="1" max="30"></label>
+        </div>
+        <p class="pomodoro-count">Sessões concluídas hoje: <strong id="pomodoroCount">0</strong></p>
+      </div>
+    </section>
+
+    <!-- ESTUDOS -->
+    <section class="tab" id="tab-estudos">
+      <header class="tab-head">
+        <p class="eyebrow">avaliações</p>
+        <h1>ENAMED</h1>
+        <p class="sub">Suas notas nos simulados e o conteúdo programático de cada período.</p>
+      </header>
+
+      <div class="filter-row" id="studySubnav">
+        <button class="filter-chip active" data-study="simulados">Simulados</button>
+        <button class="filter-chip" data-study="conteudo">Conteúdo programático</button>
+      </div>
+
+      <!-- SIMULADOS -->
+      <div id="studySimulados">
+        <div class="stats-row" id="simuladoStatsRow"></div>
+
+        <div class="chart-card" id="simuladoChartCard" style="display:none">
+          <h3>Evolução da nota geral</h3>
+          <canvas id="simuladoChart" height="90"></canvas>
+        </div>
+
+        <div class="agenda-embed-card">
+          <div class="card-head-row"><h3>Novo simulado</h3></div>
+          <form id="simuladoForm" class="event-form">
+            <div class="event-row">
+              <label style="flex:2">Nome<input type="text" id="simNome" placeholder="Ex: Simulado ENAMED 3" required></label>
+              <label>Data<input type="date" id="simData" required></label>
+              <label>Nota geral<input type="number" id="simNota" placeholder="0-100" min="0" max="1000" step="0.1" required></label>
+            </div>
+            <div id="simAreasList" class="sim-areas-list"></div>
+            <button type="button" class="ghost-btn small" id="addAreaBtn" style="align-self:flex-start">+ Nota por área</button>
+            <button type="submit" class="primary-btn">Salvar simulado</button>
+          </form>
+        </div>
+
+        <div class="simulado-list" id="simuladoList"></div>
+        <p class="empty-note" id="simuladoEmptyNote">Nenhum simulado registrado ainda.</p>
+      </div>
+
+      <!-- CONTEÚDO PROGRAMÁTICO -->
+      <div id="studyConteudo" style="display:none">
+        <div class="agenda-embed-card">
+          <div class="card-head-row"><h3>Novo período</h3></div>
+          <form class="add-row" id="periodForm">
+            <input type="text" id="periodInput" placeholder="Ex: 5º Semestre" autocomplete="off">
+            <button type="submit" class="primary-btn">Adicionar período</button>
+          </form>
+        </div>
+
+        <div id="periodList"></div>
+        <p class="empty-note" id="periodEmptyNote">Nenhum período cadastrado ainda.</p>
+      </div>
+    </section>
+
+    <!-- TREINO -->
+    <section class="tab" id="tab-treino">
+      <header class="tab-head">
+        <p class="eyebrow">musculação</p>
+        <h1>Treino</h1>
+        <p class="sub">Cada treino, cada série, registrado.</p>
+      </header>
+
+      <div class="stats-row" id="workoutStatsRow"></div>
+
+      <div class="chart-card" id="workoutChartCard" style="display:none">
+        <div class="card-head-row">
+          <h3>Evolução de carga</h3>
+          <select id="exerciseSelect" class="chart-select"></select>
+        </div>
+        <canvas id="workoutChart" height="90"></canvas>
+      </div>
+
+      <div class="agenda-embed-card">
+        <div class="card-head-row"><h3>Novo treino</h3></div>
+        <form class="add-row" id="sessionForm">
+          <input type="text" id="sessionLabel" placeholder="Nome do treino (ex: Peito e Tríceps)..." autocomplete="off">
+          <input type="date" id="sessionDate" required>
+          <button type="submit" class="primary-btn">Adicionar treino</button>
+        </form>
+      </div>
+
+      <div id="sessionList"></div>
+      <p class="empty-note" id="sessionEmptyNote">Nenhum treino registrado ainda.</p>
+    </section>
+
+    <!-- NOTAS -->
+    <section class="tab" id="tab-notas">
+      <header class="tab-head">
+        <p class="eyebrow">registro</p>
+        <h1>Notas</h1>
+        <p class="sub">Ideias soltas antes que evaporem.</p>
+      </header>
+
+      <form class="add-row" id="noteForm">
+        <input type="text" id="noteTitleInput" placeholder="Título..." autocomplete="off">
+        <button type="submit" class="primary-btn">Nova nota</button>
+      </form>
+      <textarea id="noteBodyInput" placeholder="Escreva aqui..." rows="3"></textarea>
+
+      <div class="note-grid" id="noteGrid"></div>
+      <p class="empty-note" id="noteEmptyNote">Nenhuma nota ainda.</p>
+    </section>
+
+    <!-- DIÁRIO -->
+    <section class="tab" id="tab-diario">
+      <header class="tab-head">
+        <p class="eyebrow">reflexão</p>
+        <h1>Diário</h1>
+        <p class="sub">Um espaço para registrar o dia, sem edição.</p>
+      </header>
+
+      <div class="journal-editor">
+        <p class="journal-date" id="journalDate"></p>
+        <textarea id="journalInput" placeholder="Como foi o seu dia hoje?" rows="6"></textarea>
+        <button class="primary-btn" id="journalSaveBtn">Salvar entrada</button>
+      </div>
+
+      <div class="journal-list" id="journalList"></div>
+    </section>
+
+    <!-- FLASHCARDS -->
+    <section class="tab" id="tab-flashcards">
+      <header class="tab-head">
+        <p class="eyebrow">memória</p>
+        <h1>Revisão</h1>
+        <p class="sub">Flashcards para fixar o que importa.</p>
+      </header>
+
+      <form class="add-row flash-form" id="flashForm">
+        <input type="text" id="flashFront" placeholder="Frente (pergunta)..." autocomplete="off">
+        <input type="text" id="flashBack" placeholder="Verso (resposta)..." autocomplete="off">
+        <button type="submit" class="primary-btn">Criar card</button>
+      </form>
+
+      <div class="flash-stage" id="flashStage">
+        <div class="flash-card" id="flashCard">
+          <p class="flash-empty">Adicione um card para começar a revisar.</p>
+        </div>
+        <div class="flash-controls" id="flashControls" style="display:none">
+          <button class="ghost-btn" id="flashPrev">Anterior</button>
+          <button class="primary-btn" id="flashFlip">Virar</button>
+          <button class="ghost-btn" id="flashNext">Próximo</button>
+        </div>
+        <p class="flash-count" id="flashCount"></p>
+      </div>
+      <div class="flash-deck-list" id="flashDeckList"></div>
+    </section>
+
+    <!-- METAS -->
+    <section class="tab" id="tab-metas">
+      <header class="tab-head">
+        <p class="eyebrow">direção</p>
+        <h1>Metas</h1>
+        <p class="sub">Onde você quer chegar, com prazo.</p>
+      </header>
+
+      <form class="add-row" id="goalForm">
+        <input type="text" id="goalInput" placeholder="Nova meta..." autocomplete="off">
+        <input type="date" id="goalDate">
+        <button type="submit" class="primary-btn">Adicionar</button>
+      </form>
+
+      <div class="goal-list" id="goalList"></div>
+      <p class="empty-note" id="goalEmptyNote">Nenhuma meta cadastrada ainda.</p>
+    </section>
+
+    <!-- PROGRESSO -->
+    <section class="tab" id="tab-progresso">
+      <header class="tab-head">
+        <p class="eyebrow">panorama</p>
+        <h1>Progresso</h1>
+        <p class="sub">O resumo da semana, em números.</p>
+      </header>
+
+      <div class="stats-row" id="statsRow"></div>
+
+      <div class="chart-card">
+        <h3>Hábitos concluídos — últimos 7 dias</h3>
+        <canvas id="habitChart" height="90"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>Tarefas concluídas — últimos 7 dias</h3>
+        <canvas id="taskChart" height="90"></canvas>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== Command palette ===== -->
+<div class="palette-overlay" id="paletteOverlay">
+  <div class="palette-box">
+    <div class="palette-input-row">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5.2" stroke="currentColor" stroke-width="1.4"/><path d="M14 14l-3.2-3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" id="paletteInput" placeholder="Buscar tarefas, notas, hábitos, metas...">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="palette-results" id="paletteResults"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
